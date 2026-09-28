@@ -1,5 +1,12 @@
 # grill-with-ui
 
+**This fork's adoption note:** Finish now also writes each `durable` decision as a real ADR
+in the project's own `docs/adr/` and merges settled `terms` into the project's own
+`CONTEXT.md`, instead of only the flat design doc upstream writes — so a grill's durable
+output survives as the project's own record. See the `Finish` section of `SKILL.md`. Not
+yet upstreamed; everything else in this fork is unchanged from
+[jasonku09/grill-with-ui](https://github.com/jasonku09/grill-with-ui).
+
 A skill for coding agents that moves a "grilling" design interview out of the terminal and
 onto a local browser page. The agent asks its questions as cards, each with lettered options
 and a highlighted recommendation. You answer them in any order, defer or reopen them, discuss

@@ -331,29 +331,56 @@ also be changed this way ("write the doc to …" → patch `"doc"`).
 
 On a `finish` action, or when the user says finish in the terminal:
 
-1. Write the design doc to `doc` (relative to the project root). It is exhaustive and
+1. **Write an ADR for every `durable: true` answered question, into the project's own
+   `docs/adr/` — never only into the design doc.** This is what makes a grill's durable
+   decisions survive as the project's own record, not a one-off file only this grill
+   produced. For each:
+   - Scan `docs/adr/` under the project root for the highest existing `NNNN-slug.md`
+     number (zero-padded to four digits) and take the next one; create the directory if
+     this is the first ADR the project has ever had.
+   - Write `docs/adr/NNNN-<slug-of-title>.md`: a short title, then 1-3 sentences — the
+     context, what was decided, and why — per this project's own ADR format if one is
+     documented (e.g. a `domain-modeling`-style `ADR-FORMAT.md`); the same shape otherwise.
+     Add a **Considered Options** section only when the question's `explore` rows exist
+     (the rejected options and the pros/cons that lost); add **Consequences** only when
+     something non-obvious follows. Most ADRs need neither.
+   - A decision that reverses or refines an ADR already written by an earlier grill in
+     this same project gets a **new** ADR (never edit one already there) whose first
+     sentence names the one it supersedes.
+2. **Merge every `terms` entry into the project's own glossary** (`CONTEXT.md` at the
+   project root, or the right context's `CONTEXT.md` under a `CONTEXT-MAP.md` if the
+   project has more than one — infer which from where this grill's topic lives; ask if
+   unclear). For each term: a known term already there with the **same** meaning is left
+   alone; a known term with a **different** meaning is not silently overwritten — note the
+   conflict in the terminal output and ask which wins before writing; a new term is
+   appended in this project's own glossary format (term, one-or-two-sentence definition,
+   an `_Avoid_` list) if one is documented, or as `**Term**: definition` otherwise. Create
+   the file, with a one-line description of the context, only if it does not exist yet.
+3. Write the design doc to `doc` (relative to the project root). It is exhaustive and
    self-contained, in this order: a one-paragraph summary (linking the visual at
-   `docs/<slug>-visual.html` when there is one, see step 3); **Terms** (each with its
-   Avoid list); **Why** (the problem in the user's words); **Locked decisions** (every
-   `durable` question: the decision, the rejected options and why each lost); **Routine
-   choices** (every other answered question, one bullet each); **Verified facts** (anything
-   you established by exploring rather than asking, if any); **Risks**; **Deferred**
-   (deferred questions, with what would reopen them); **Open threads** (discussion points
-   that ended without a decision). Do not compress: a reader with no access to the session
-   must be able to build from it.
-2. Patch `"finished": { "doc": … }` and `"agent": { "status": "waiting" }`
+   `docs/<slug>-visual.html` when there is one, see step 5); **Terms** (each with its
+   Avoid list, and a note that they are also now in the project's own glossary); **Why**
+   (the problem in the user's words); **Locked decisions** (every `durable` question: the
+   decision in one line, then a link to the ADR file written for it in step 1 — never
+   duplicate the ADR's own rationale here); **Routine choices** (every other answered
+   question, one bullet each); **Verified facts** (anything you established by exploring
+   rather than asking, if any); **Risks**; **Deferred** (deferred questions, with what
+   would reopen them); **Open threads** (discussion points that ended without a decision).
+   Do not compress: a reader with no access to the session must be able to build from it.
+4. Patch `"finished": { "doc": … }` and `"agent": { "status": "waiting" }`
    (after a page Finish this is the send's one patch, with `handled`); the page shows the
    finished banner and locks staging.
-3. If `state.visual` exists, it must be reconciled with every answered question before it
+5. If `state.visual` exists, it must be reconciled with every answered question before it
    is exported. If no draw is in flight and it is not stale and nothing disagrees, copy
    `<session>/visual.html` to `docs/<slug>-visual.html` next to the doc (same folder, same
    slug, `-visual.html`) and add `"visual": <that path>` to `finished` (it is replaced
-   whole, so give `doc` again, or fold it into the step 2 patch). Otherwise request one
+   whole, so give `doc` again, or fold it into the step 4 patch). Otherwise request one
    reconciling draw (or let the in-flight one land), return to listening, and when it lands
    copy the file and patch `finished` with `visual` then.
-4. Once there is no draw in flight and the exports are complete, stop the persistent
+6. Once there is no draw in flight and the exports are complete, stop the persistent
    Monitor with TaskStop, or stop the server as described in Wait mode.
-5. Print one line with the doc path (and the visual's). End.
+7. Print one line with the doc path, the ADR file(s) written, and the visual's path if
+   any. End.
 
 ## Wait mode (agents without a Monitor tool)
 
